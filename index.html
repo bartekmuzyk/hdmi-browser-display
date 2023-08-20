@@ -2,69 +2,92 @@
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
-        <title>Wyświetlacz HDMI</title>
+        <title>HDMI</title>
         <link rel="stylesheet" href="materialize/css/materialize.min.css">
         <script src="materialize/js/materialize.min.js"></script>
         <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="materialize/css/nouislider.css">
     </head>
     <body>
-        <div id="input-choice-screen" data-show="1">
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                <h3>Wybierz urządzenie przechwytujące</h3>
-                <div class="input-field">
-                    <select id="video-input-select">
-
-                    </select>
-                    <label>Wejście wideo</label>
-                </div>
-                <div class="input-field">
-                    <select id="audio-input-select">
-
-                    </select>
-                    <label>Wejście audio</label>
-                </div>
-                <div style="width: 100%; display: flex; flex-direction: row; justify-content: flex-end;">
-                    <div id="devices-loading-spinner" class="preloader-wrapper small active" style="margin-right: 20px;">
-                        <div class="spinner-layer spinner-blue">
-                            <div class="circle-clipper left">
-                                <div class="circle"></div>
-                            </div><div class="gap-patch">
+        <div id="splash-screen" data-show="1">
+            <i class="material-icons">hourglass_bottom</i>
+            <div>
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
                             <div class="circle"></div>
-                        </div><div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                        </div>
-
-                        <div class="spinner-layer spinner-red">
-                            <div class="circle-clipper left">
-                                <div class="circle"></div>
-                            </div><div class="gap-patch">
-                            <div class="circle"></div>
-                        </div><div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                        </div>
-
-                        <div class="spinner-layer spinner-yellow">
-                            <div class="circle-clipper left">
-                                <div class="circle"></div>
-                            </div><div class="gap-patch">
-                            <div class="circle"></div>
-                        </div><div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                        </div>
-
-                        <div class="spinner-layer spinner-green">
-                            <div class="circle-clipper left">
-                                <div class="circle"></div>
-                            </div><div class="gap-patch">
-                            <div class="circle"></div>
-                        </div><div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                        </div>
+                        </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
                     </div>
+                    </div>
+                </div>
+                <h5>Ładowanie</h5>
+            </div>
+            <button class="waves-effect waves-light teal btn" onclick="location.reload();" style="visibility: hidden;">
+                <i class="material-icons left">refresh</i> Odśwież
+            </button>
+        </div>
+
+        <div id="config-screen" data-show="1">
+            <div style="width: 700px;">
+                <ul class="tabs">
+                    <li class="tab">
+                        <a href="#input-tab" class="active"><i class="material-icons">settings_input_hdmi</i> Urządzenia wejścia</a>
+                    </li>
+                    <li class="tab">
+                        <a href="#video-tab"><i class="material-icons">tv</i> Wideo</a>
+                    </li>
+                    <li class="tab">
+                        <a href="#audio-tab"><i class="material-icons">volume_up</i> Audio</a>
+                    </li>
+                </ul>
+                <div id="input-tab" class="tab-content">
+                    <h4>Wejście wideo</h4>
+                    <h4>Wejście audio</h4>
+                    <div id="video-input-select"></div>
+                    <div id="audio-input-select"></div>
+                </div>
+                <div id="video-tab" class="tab-content">
+                    <h4 style="text-align: right; grid-area: previewheader;">Podgląd</h4>
+                    <video id="video-tab-preview" style="grid-area: preview;"></video>
+                    <div style="grid-area: settings; padding: 16px 20px 16px 16px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div class="slider-wrapper">
+                            <label>
+                                <i class="material-icons left">brightness_7</i>
+                                Jasność
+                            </label>
+                            <div id="brightness-slider"></div>
+                        </div>
+
+                        <div class="slider-wrapper">
+                            <label>
+                                <i class="material-icons left">contrast</i>
+                                Kontrast
+                            </label>
+                            <div id="contrast-slider"></div>
+                        </div>
+
+                        <div class="slider-wrapper">
+                            <label>
+                                <i class="material-icons left">exposure</i>
+                                Nasycenie
+                            </label>
+                            <div id="saturation-slider"></div>
+                        </div>
+
+                        <button id="video-tab-apply-btn" class="waves-effect waves-light teal btn" style="align-self: flex-end;">Zastosuj</button>
+                    </div>
+                </div>
+                <div id="audio-tab" class="tab-content">
+
+                </div>
+
+                <div style="margin-top: 10px; width: 100%; display: flex; flex-direction: row; justify-content: flex-end;">
+                    <button class="waves-effect waves-dark btn-flat" onclick="location.reload();" style="margin-right: 5px;">
+                        <i class="material-icons left">refresh</i> Odśwież
+                    </button>
                     <a id="start-btn" class="waves-effect waves-light btn" disabled>
                         <i class="material-icons left">play_arrow</i>Rozpocznij
                     </a>
@@ -72,7 +95,8 @@
             </div>
         </div>
 
-        <div id="display-screen" data-show="0">
+        <div id="display-screen" data-show="1">
+            <video id="display"></video>
         </div>
 
         <div id="no-devices-modal" class="modal">
@@ -81,10 +105,11 @@
                 <p></p>
             </div>
             <div class="modal-footer">
-                <a href="javascript:location.reload()" class="waves-effect waves-light btn">Odśwież</a>
+                <button onclick="location.reload();" class="waves-effect waves-light btn">Odśwież</button>
             </div>
         </div>
 
+        <script src="materialize/js/nouislider.js"></script>
         <script defer src="script.js"></script>
     </body>
 </html>
