@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>Wyświetlacz HDMI</title>
+        <link rel="stylesheet" href="materialize/css/materialize.min.css">
+        <script src="materialize/js/materialize.min.js"></script>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div id="input-choice-screen" data-show="1">
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <h3>Wybierz urządzenie przechwytujące</h3>
+                <div class="input-field">
+                    <select id="video-input-select">
+
+                    </select>
+                    <label>Wejście wideo</label>
+                </div>
+                <div class="input-field">
+                    <select id="audio-input-select">
+
+                    </select>
+                    <label>Wejście audio</label>
+                </div>
+                <div style="width: 100%; display: flex; flex-direction: row; justify-content: flex-end;">
+                    <div id="devices-loading-spinner" class="preloader-wrapper small active" style="margin-right: 20px;">
+                        <div class="spinner-layer spinner-blue">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div><div class="gap-patch">
+                            <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                        </div>
+
+                        <div class="spinner-layer spinner-red">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div><div class="gap-patch">
+                            <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                        </div>
+
+                        <div class="spinner-layer spinner-yellow">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div><div class="gap-patch">
+                            <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                        </div>
+
+                        <div class="spinner-layer spinner-green">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div><div class="gap-patch">
+                            <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                        </div>
+                    </div>
+                    <a id="start-btn" class="waves-effect waves-light btn" disabled>
+                        <i class="material-icons left">play_arrow</i>Rozpocznij
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="display-screen" data-show="0">
+        </div>
+
+        <div id="no-devices-modal" class="modal">
+            <div class="modal-content">
+                <h4>Nie wykryto urządzeń</h4>
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:location.reload()" class="waves-effect waves-light btn">Odśwież</a>
+            </div>
+        </div>
+
+        <script defer src="script.js"></script>
+    </body>
+</html>
