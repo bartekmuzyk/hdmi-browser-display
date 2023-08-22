@@ -31,6 +31,7 @@
         </div>
 
         <div id="config-screen" data-show="1">
+            <video id="big-preview-display"></video>
             <div style="width: 700px;">
                 <ul class="tabs">
                     <li class="tab">
@@ -40,7 +41,7 @@
                         <a href="#video-tab"><i class="material-icons">tv</i> Wideo</a>
                     </li>
                     <li class="tab">
-                        <a href="#audio-tab"><i class="material-icons">volume_up</i> Audio</a>
+                        <a href="#audio-tab"><i class="material-icons">settings_input_composite</i> Audio</a>
                     </li>
                 </ul>
                 <div id="input-tab" class="tab-content">
@@ -49,7 +50,7 @@
                     <div id="video-input-select"></div>
                     <div id="audio-input-select"></div>
                 </div>
-                <div id="video-tab" class="tab-content">
+                <div id="video-tab" class="tab-content" data-floating="0">
                     <h4 style="text-align: right; grid-area: previewheader;">Podgląd</h4>
                     <video id="video-tab-preview" style="grid-area: preview;"></video>
                     <div style="grid-area: settings; padding: 16px 20px 16px 16px; display: flex; flex-direction: column; justify-content: space-between;">
@@ -57,6 +58,9 @@
                             <label>
                                 <i class="material-icons left">brightness_7</i>
                                 Jasność
+                            </label>
+                            <label>
+                                0
                             </label>
                             <div id="brightness-slider"></div>
                         </div>
@@ -66,6 +70,9 @@
                                 <i class="material-icons left">contrast</i>
                                 Kontrast
                             </label>
+                            <label>
+                                0
+                            </label>
                             <div id="contrast-slider"></div>
                         </div>
 
@@ -74,14 +81,44 @@
                                 <i class="material-icons left">exposure</i>
                                 Nasycenie
                             </label>
+                            <label>
+                                0
+                            </label>
                             <div id="saturation-slider"></div>
                         </div>
 
-                        <button id="video-tab-apply-btn" class="waves-effect waves-light teal btn" style="align-self: flex-end;">Zastosuj</button>
+                        <div style="display: flex; flex-direction: row; justify-content: flex-end;">
+                            <button id="big-preview-btn" class="waves-effect waves-dark btn-flat" style="margin-right: 10px;">
+                                <i class="material-icons left">fullscreen</i>
+                                Duży podgląd
+                            </button>
+                            <button id="video-tab-apply-btn" class="waves-effect waves-light teal btn" style="align-self: flex-end;">Zastosuj</button>
+                        </div>
                     </div>
                 </div>
                 <div id="audio-tab" class="tab-content">
-
+                    <div style="padding: 16px; grid-area: volume;">
+                        <div class="slider-wrapper">
+                            <label>
+                                <i class="material-icons left">volume_up</i>
+                                Głośność
+                            </label>
+                            <label>
+                                0
+                            </label>
+                            <div id="volume-slider"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; grid-area: loopback; padding: 0 10px;">
+                        <label>Nasłuchiwanie</label>
+                        <button id="loopback-on-btn" class="waves-effect waves-light btn green" style="display: block;">
+                            Włącz
+                        </button>
+                        <button id="loopback-off-btn" class="waves-effect waves-light btn red" style="display: none;">
+                            Wyłącz
+                        </button>
+                    </div>
+                    <canvas id="audio-visualizer"></canvas>
                 </div>
 
                 <div style="margin-top: 10px; width: 100%; display: flex; flex-direction: row; justify-content: flex-end;">
@@ -97,6 +134,23 @@
 
         <div id="display-screen" data-show="1">
             <video id="display"></video>
+            <div class="fixed-action-btn hidden">
+                <a class="btn-floating btn-large red waves-effect waves-light">
+                    <i class="large material-icons">tune</i>
+                </a>
+                <ul>
+                    <li>
+                        <a class="btn-floating tooltipped modal-trigger" href="#volume-modal" data-position="top" data-tooltip="Głośność">
+                            <i class="material-icons">volume_up</i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="btn-floating tooltipped" data-position="top" data-tooltip="Zakończ" onclick="location.reload();">
+                            <i class="material-icons">logout</i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div id="no-devices-modal" class="modal">
@@ -106,6 +160,24 @@
             </div>
             <div class="modal-footer">
                 <button onclick="location.reload();" class="waves-effect waves-light btn">Odśwież</button>
+            </div>
+        </div>
+
+        <div id="volume-modal" class="modal">
+            <div class="modal-content" style="overflow: hidden;">
+                <div class="slider-wrapper">
+                    <label>
+                        <i class="material-icons left">volume_up</i>
+                        Głośność
+                    </label>
+                    <label>
+                        0
+                    </label>
+                    <div id="screen-volume-slider"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="waves-effect waves-dark btn-flat modal-close">Zamknij</button>
             </div>
         </div>
 
