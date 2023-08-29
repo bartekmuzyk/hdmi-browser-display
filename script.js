@@ -329,7 +329,8 @@ bigPreviewBtn.onclick = () => {
     bigPreviewBtn.blur();
 };
 
-const audioCtx = new AudioContext();
+/** @type {AudioContext} */
+let audioCtx = null;
 
 document.querySelector(`#config-screen .tabs a[href="#audio-tab"]`).parentElement.onclick = () => {
     const options = AudioOptions.get(SelectedAudioDevice.deviceId);
@@ -340,6 +341,8 @@ document.querySelector(`#config-screen .tabs a[href="#audio-tab"]`).parentElemen
     const canvasCtx = audioVisualizer.getContext("2d");
     const width = audioVisualizer.width;
     const height = audioVisualizer.height;
+
+    if (!audioCtx) audioCtx = new AudioContext();
 
     const analyser = audioCtx.createAnalyser();
     const source = audioCtx.createMediaStreamSource(SelectedAudioDevice.stream);
