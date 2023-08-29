@@ -74,7 +74,7 @@ body {
     position: relative;
 }
 
-body > div:not(.modal):not(#toast-container):not(.material-tooltip) {
+body > div:not(.modal):not(#toast-container):not(.material-tooltip)[data-show] {
     position: absolute;
     top: 0;
     left: 0;
