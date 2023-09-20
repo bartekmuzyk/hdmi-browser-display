@@ -141,8 +141,8 @@ async function onGotDevices(devices) {
                 const videoStream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         deviceId: {exact: input.deviceId},
-                        width: {exact: 1280},
-                        height: {exact: 720},
+                        width: {ideal: 1280},
+                        height: {ideal: 720},
                         frameRate: 60
                     },
                     audio: false
