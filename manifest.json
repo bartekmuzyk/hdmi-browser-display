@@ -3,6 +3,11 @@
   "name": "Wyświetlacz HDMI",
   "icons": [
     {
+      "src": "/images/icons128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
       "src": "/images/icons192.png",
       "type": "image/png",
       "sizes": "192x192"
