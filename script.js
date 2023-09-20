@@ -135,81 +135,93 @@ async function onGotDevices(devices) {
 
         switch (input.kind) {
             case "videoinput":
-                videoInputCount++;
-                videoInputSelect.appendChild(optionElement);
+                let videoStream;
 
-                const videoStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        deviceId: {exact: input.deviceId},
-                        width: {ideal: 1280},
-                        height: {ideal: 720},
-                        frameRate: 60
-                    },
-                    audio: false
-                });
+                try {
+                    videoStream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            deviceId: {exact: input.deviceId},
+                            width: {ideal: 1280},
+                            height: {ideal: 720},
+                            frameRate: 60
+                        },
+                        audio: false
+                    });
 
-                const videoTrack = videoStream.getVideoTracks()[0];
-                let videoOptions = VideoOptions.get(input.deviceId);
+                    const videoTrack = videoStream.getVideoTracks()[0];
+                    let videoOptions = VideoOptions.get(input.deviceId);
 
-                if (videoOptions === null) {
-                    const capabilities = videoTrack.getCapabilities();
+                    if (videoOptions === null) {
+                        const capabilities = videoTrack.getCapabilities();
 
-                    videoOptions = {
-                        brightness: capabilities.hasOwnProperty("brightness") ?
-                            Math.round((capabilities.brightness.min + capabilities.brightness.max) / 2)
-                            : null,
-                        contrast: capabilities.hasOwnProperty("contrast") ?
-                            Math.round((capabilities.contrast.min + capabilities.contrast.max) / 2)
-                            : null,
-                        saturation: capabilities.hasOwnProperty("saturation") ?
-                            Math.round((capabilities.saturation.min + capabilities.saturation.max) / 2)
-                            : null,
-                    };
-                    for (const key of Object.keys(videoOptions)) {
-                        if (videoOptions[key] === null) {
-                            delete videoOptions[key];
+                        videoOptions = {
+                            brightness: capabilities.hasOwnProperty("brightness") ?
+                                Math.round((capabilities.brightness.min + capabilities.brightness.max) / 2)
+                                : null,
+                            contrast: capabilities.hasOwnProperty("contrast") ?
+                                Math.round((capabilities.contrast.min + capabilities.contrast.max) / 2)
+                                : null,
+                            saturation: capabilities.hasOwnProperty("saturation") ?
+                                Math.round((capabilities.saturation.min + capabilities.saturation.max) / 2)
+                                : null,
+                        };
+                        for (const key of Object.keys(videoOptions)) {
+                            if (videoOptions[key] === null) {
+                                delete videoOptions[key];
+                            }
+                        }
+
+                        console.log(`${input.deviceId} capabilities: ${Object.keys(videoOptions).join(", ")}`);
+                        VideoOptions.set(input.deviceId, videoOptions);
+                    } else {
+                        if (Object.keys(videoOptions).length > 0) {
+                            console.log(`setting ${input.deviceId} constraints: %o`, videoOptions);
+                            await videoTrack.applyConstraints({advanced: [videoOptions]});
                         }
                     }
-
-                    console.log(`${input.deviceId} capabilities: ${Object.keys(videoOptions).join(", ")}`);
-                    VideoOptions.set(input.deviceId, videoOptions);
-                } else {
-                    if (Object.keys(videoOptions).length > 0) {
-                        console.log(`setting ${input.deviceId} constraints: %o`, videoOptions);
-                        await videoTrack.applyConstraints({advanced: [videoOptions]});
-                    }
+                } catch (e) {
+                    console.warn("could not get video stream: %o", e);
+                    continue;
                 }
 
                 videoStreams[input.deviceId] = videoStream;
+                videoInputCount++;
+                videoInputSelect.appendChild(optionElement);
 
                 break;
             case "audioinput":
-                audioInputCount++;
-                audioInputSelect.appendChild(optionElement);
+                let audioStream;
 
-                const audioStream = await navigator.mediaDevices.getUserMedia({
-                    video: false,
-                    audio: {
-                        deviceId: {exact: input.deviceId},
-                        autoGainControl: false,
-                        channelCount: 2,
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        sampleRate: 48000,
-                        sampleSize: 16
+                try {
+                    audioStream = await navigator.mediaDevices.getUserMedia({
+                        video: false,
+                        audio: {
+                            deviceId: {exact: input.deviceId},
+                            autoGainControl: false,
+                            channelCount: 2,
+                            echoCancellation: false,
+                            noiseSuppression: false,
+                            sampleRate: 48000,
+                            sampleSize: 16
+                        }
+                    });
+
+                    let audioOptions = AudioOptions.get(input.deviceId);
+
+                    if (audioOptions === null) {
+                        audioOptions = {
+                            volume: 50
+                        };
+                        AudioOptions.set(input.deviceId, audioOptions);
                     }
-                });
-
-                let audioOptions = AudioOptions.get(input.deviceId);
-
-                if (audioOptions === null) {
-                    audioOptions = {
-                        volume: 50
-                    };
-                    AudioOptions.set(input.deviceId, audioOptions);
+                } catch (e) {
+                    console.warn("could not get audio stream: %o", e);
+                    continue;
                 }
 
                 audioStreams[input.deviceId] = audioStream;
+                audioInputCount++;
+                audioInputSelect.appendChild(optionElement);
 
                 break;
         }
@@ -435,6 +447,7 @@ startBtn.onclick = () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     await onGotDevices(devices);
 
+    console.log("init materialize css");
     M.AutoInit(document.body);
     M.FloatingActionButton.init(document.querySelectorAll('.fixed-action-btn'), {
         direction: "left",
