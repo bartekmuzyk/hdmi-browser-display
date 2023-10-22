@@ -20,6 +20,7 @@ const loopbackOffBtn = document.getElementById("loopback-off-btn");
 const display = document.getElementById("display");
 const displayScreenMenuBtn = document.querySelector("#display-screen > div.fixed-action-btn");
 const screenVolumeSlider = document.getElementById("screen-volume-slider");
+const exclusionsList = document.querySelector("#exclude-tab > textarea");
 
 function createInputRadioButton(text, value, group) {
     const p = document.createElement("p");
@@ -34,6 +35,14 @@ function createInputRadioButton(text, value, group) {
     span.innerText = text;
     label.appendChild(span);
     p.appendChild(label);
+
+    p.appendChild(document.createElement("br"));
+
+    const copyIdBtn = document.createElement("button");
+    copyIdBtn.className = "waves-effect waves-teal btn-flat";
+    copyIdBtn.innerHTML = `<i class="material-icons left">content_copy</i> ID`;
+    copyIdBtn.onclick = () => navigator.clipboard.writeText(value);
+    p.appendChild(copyIdBtn);
 
     return p;
 }
@@ -115,11 +124,25 @@ function switchScreen(targetId) {
     document.querySelector(`body > div#${targetId}`).setAttribute("data-show", "1");
 }
 
+let excludedDevices = [];
+
+{
+    const exclusionsString = localStorage.getItem("exclude.devices");
+
+    if (exclusionsString) {
+        excludedDevices = JSON.parse(exclusionsString)
+        exclusionsList.value = excludedDevices.join("\n");
+    }
+}
+
 /**
  * @param devices {MediaDeviceInfo[]}
  */
 async function onGotDevices(devices) {
-    const inputs = devices.filter(device => device.deviceId !== "default" && device.kind !== "audiooutput");
+    const inputs = devices.filter(device =>
+        !["default", "communications", ...excludedDevices].includes(device.deviceId) &&
+        device.kind !== "audiooutput"
+    );
     console.log("onGotDevices inputs: %o", devices);
 
     if (inputs.length === 0) {
@@ -425,6 +448,10 @@ startBtn.onclick = () => {
     display.srcObject = stream;
     display.volume = audioOptions.volume / 100;
     display.play();
+};
+
+exclusionsList.oninput = () => {
+    localStorage.setItem("exclude.devices", JSON.stringify(exclusionsList.value.trim().split("\n")));
 };
 
 (async function() {
