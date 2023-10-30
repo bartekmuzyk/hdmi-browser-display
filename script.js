@@ -22,6 +22,30 @@ const displayScreenMenuBtn = document.querySelector("#display-screen > div.fixed
 const screenVolumeSlider = document.getElementById("screen-volume-slider");
 const exclusionsList = document.querySelector("#exclude-tab > textarea");
 
+// Firefox polyfill
+if (typeof MediaStreamTrack.prototype.getCapabilities !== "function") {
+    MediaStreamTrack.prototype.getCapabilities = function() {
+        return {};
+    };
+}
+
+valueOrDefault = (value, default_) => value ? value : default_;
+
+function cutObject(obj, keys) {
+    const result = {};
+
+    for (const key of keys) {
+        if (obj.hasOwnProperty(key)) {
+            result[key] = obj[key];
+        }
+    }
+
+    return result;
+}
+
+const DEFAULT_RESOLUTION_WIDTH = 1280;
+const DEFAULT_RESOLUTION_HEIGHT = 720;
+
 function createInputRadioButton(text, value, group) {
     const p = document.createElement("p");
     const label = document.createElement("label");
@@ -130,8 +154,11 @@ let excludedDevices = [];
     const exclusionsString = localStorage.getItem("exclude.devices");
 
     if (exclusionsString) {
-        excludedDevices = JSON.parse(exclusionsString)
+        excludedDevices = JSON.parse(exclusionsString);
+        console.table(excludedDevices, ["excluded devices"]);
         exclusionsList.value = excludedDevices.join("\n");
+    } else {
+        exclusionsList.value = "";
     }
 }
 
@@ -161,18 +188,19 @@ async function onGotDevices(devices) {
                 let videoStream;
 
                 try {
+                    let videoOptions = VideoOptions.get(input.deviceId);
+
+                    const resolution = videoOptions ? videoOptions.resolution : null;
                     videoStream = await navigator.mediaDevices.getUserMedia({
                         video: {
                             deviceId: {exact: input.deviceId},
-                            width: {ideal: 1280},
-                            height: {ideal: 720},
+                            width: {ideal: resolution ? resolution.width : DEFAULT_RESOLUTION_WIDTH},
+                            height: {ideal: resolution ? resolution.height : DEFAULT_RESOLUTION_HEIGHT},
                             frameRate: 60
                         },
                         audio: false
                     });
-
                     const videoTrack = videoStream.getVideoTracks()[0];
-                    let videoOptions = VideoOptions.get(input.deviceId);
 
                     if (videoOptions === null) {
                         const capabilities = videoTrack.getCapabilities();
@@ -187,7 +215,12 @@ async function onGotDevices(devices) {
                             saturation: capabilities.hasOwnProperty("saturation") ?
                                 Math.round((capabilities.saturation.min + capabilities.saturation.max) / 2)
                                 : null,
+                            resolution: {
+                                width: DEFAULT_RESOLUTION_WIDTH,
+                                height: DEFAULT_RESOLUTION_HEIGHT
+                            }
                         };
+
                         for (const key of Object.keys(videoOptions)) {
                             if (videoOptions[key] === null) {
                                 delete videoOptions[key];
@@ -195,13 +228,16 @@ async function onGotDevices(devices) {
                         }
 
                         console.log(`${input.deviceId} capabilities: ${Object.keys(videoOptions).join(", ")}`);
-                        VideoOptions.set(input.deviceId, videoOptions);
                     } else {
-                        if (Object.keys(videoOptions).length > 0) {
-                            console.log(`setting ${input.deviceId} constraints: %o`, videoOptions);
-                            await videoTrack.applyConstraints({advanced: [videoOptions]});
+                        const constraints = cutObject(videoOptions, ["brighteness", "contrast", "saturation"]);
+
+                        if (Object.keys(constraints).length > 0) {
+                            console.log(`setting ${input.deviceId} constraints: %o`, constraints);
+                            await videoTrack.applyConstraints({advanced: [constraints]});
                         }
                     }
+
+                    VideoOptions.set(input.deviceId, videoOptions);
                 } catch (e) {
                     console.warn("could not get video stream: %o", e);
                     continue;
@@ -472,10 +508,10 @@ exclusionsList.oninput = () => {
     tempStream.getTracks().forEach(track => track.stop());
 
     const devices = await navigator.mediaDevices.enumerateDevices();
+    M.AutoInit(document.body);
     await onGotDevices(devices);
 
     console.log("init materialize css");
-    M.AutoInit(document.body);
     M.FloatingActionButton.init(document.querySelectorAll('.fixed-action-btn'), {
         direction: "left",
         hoverEnabled: false
